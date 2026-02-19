@@ -1,0 +1,227 @@
+:root {
+    --pink: #ff2d55;
+    --dark-pink: #d01d41;
+    --black: #0a0a0a;
+    --dark-grey: #1a1a1a;
+    --glass: rgba(255, 45, 85, 0.1);
+    --glass-border: rgba(255, 45, 85, 0.2);
+    --text-glow: 0 0 10px rgba(255, 45, 85, 0.5);
+    --box-glow: 0 0 20px rgba(255, 45, 85, 0.2);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background-color: var(--black);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #1a0a1a 0%, #0a0a0a 100%);
+}
+
+.container {
+    width: 100%;
+    max-width: 450px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+header {
+    text-align: center;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: var(--pink);
+    text-shadow: var(--text-glow);
+    letter-spacing: -1px;
+}
+
+.score-board {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.score-card {
+    flex: 1;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.score-card.active {
+    border-color: var(--pink);
+    box-shadow: var(--box-glow);
+}
+
+.score-card .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+}
+
+.score-card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--pink);
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 12px;
+    aspect-ratio: 1;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    padding: 12px;
+    border-radius: 24px;
+    backdrop-filter: blur(5px);
+    box-shadow: var(--box-glow);
+}
+
+.cell {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    color: var(--pink);
+    text-shadow: var(--text-glow);
+}
+
+.cell:hover:not(.x):not(.o) {
+    background: rgba(255, 45, 85, 0.1);
+    transform: scale(0.95);
+}
+
+.cell.x::after {
+    content: "X";
+    animation: popIn 0.3s forwards;
+}
+
+.cell.o::after {
+    content: "O";
+    animation: popIn 0.3s forwards;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.cell.winning {
+    background: var(--pink);
+    color: white;
+    box-shadow: 0 0 30px var(--pink);
+}
+
+footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.game-controls {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.difficulty-select {
+    display: flex;
+    background: var(--dark-grey);
+    padding: 4px;
+    border-radius: 12px;
+    width: 100%;
+}
+
+.btn {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.btn.difficulty {
+    flex: 1;
+    background: transparent;
+    color: white;
+    opacity: 0.5;
+}
+
+.btn.difficulty.active {
+    background: var(--pink);
+    color: white;
+    opacity: 1;
+    box-shadow: 0 4px 15px rgba(255, 45, 85, 0.3);
+}
+
+.btn.primary {
+    background: white;
+    color: var(--black);
+    width: 100%;
+}
+
+.btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+.status-info {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: white;
+    min-height: 1.5rem;
+}
+
+/* Confetti particles */
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: var(--pink);
+    top: -10px;
+    z-index: 10;
+    pointer-events: none;
+}

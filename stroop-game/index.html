@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rainbow Colors: Stroop Challenge</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="game-container">
+        <header>
+            <div class="stat-bubble score">
+                <span>Score:</span>
+                <span id="score">0</span>
+            </div>
+            <div class="stat-bubble timer">
+                <span>Time:</span>
+                <span id="timer">30</span>
+            </div>
+        </header>
+
+        <main class="game-area">
+            <div id="instruction">Select the <span class="highlight">INK COLOR</span>!</div>
+            <div id="target-word" class="bouncy-word">READY?</div>
+
+            <div id="color-grid" class="choices">
+                <!-- Color buttons will be injected here -->
+            </div>
+        </main>
+
+        <div id="overlay" class="overlay">
+            <div class="modal">
+                <h2 id="modal-title">Stroop Challenge! ✨</h2>
+                <p id="modal-message">Click the button that matches the <strong>ink color</strong> of the word, not what
+                    the word says!</p>
+                <div class="high-score-display none">High Score: <span id="high-score">0</span></div>
+                <button id="start-btn" class="primary-btn">Start Playing! 🦄</button>
+            </div>
+        </div>
+
+        <div id="feedback-container"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
