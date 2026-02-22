@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Librarian | Your Personal Guide to Wisdom</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;600&family=Courier+Prime&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a1210;
+            --paper-color: #fdf6e3;
+            --wood-dark: #2c1e1c;
+            --wood-light: #3d2b28;
+            --accent-color: #d4a373;
+            --text-main: #2c1e1c;
+            --text-muted: #6b5a58;
+            --border-color: #d4a37333;
+            --book-brown: #8b4513;
+            --book-teal: #2a9d8f;
+            --book-forest: #264653;
+            --book-mustard: #e9c46a;
+            --book-clay: #e76f51;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--paper-color);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            background: var(--wood-dark);
+            border: 8px solid var(--wood-light);
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header {
+            padding: 15px 30px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--wood-light);
+            z-index: 10;
+        }
+
+        .logo {
+            font-family: 'Crimson Pro', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--accent-color);
+            letter-spacing: 1px;
+        }
+
+        .api-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #api-key-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            color: var(--paper-color);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            width: 180px;
+            transition: border-color 0.3s;
+        }
+
+        #api-key-input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        #activate-btn {
+            background: var(--accent-color);
+            color: var(--wood-dark);
+            border: none;
+            padding: 6px 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #activate-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .turn-counter {
+            font-family: 'Courier Prime', monospace;
+            font-size: 13px;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        #chat-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            background-image: radial-gradient(circle at 50% 50%, rgba(212, 163, 115, 0.05) 0%, transparent 70%), url('https://www.transparenttextures.com/patterns/natural-paper.png');
+            position: relative;
+        }
+
+        #chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb {
+            background: var(--wood-light);
+            border-radius: 10px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 4px;
+            line-height: 1.6;
+            font-family: 'Crimson Pro', serif;
+            font-size: 17px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.librarian {
+            align-self: flex-start;
+            background-color: var(--paper-color);
+            color: var(--text-main);
+            box-shadow: 4px 4px 0px var(--accent-color);
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-style: italic;
+        }
+
+        .chat-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--wood-light);
+        }
+
+        #user-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--paper-color);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            resize: none;
+            padding: 8px;
+            outline: none;
+        }
+
+        #send-btn {
+            background: var(--accent-color);
+            border: none;
+            color: var(--wood-dark);
+            width: 38px;
+            height: 38px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #send-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        #bookshelf-section {
+            width: 280px;
+            background: var(--wood-light);
+            border-left: 2px solid rgba(0, 0, 0, 0.3);
+            padding: 30px 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #bookshelf-section h3 {
+            font-family: 'Crimson Pro', serif;
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 16px;
+        }
+
+        .shelf-row {
+            height: 70px;
+            border-bottom: 6px solid rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: flex-end;
+            padding: 0 4px;
+            gap: 3px;
+            margin-bottom: 12px;
+        }
+
+        .pixel-book {
+            width: 18px;
+            height: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: inset -2px 0 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .pixel-book:hover {
+            transform: translateY(-5px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .recommendation-card {
+            background: var(--paper-color);
+            color: var(--text-main);
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        .book-details {
+            display: flex;
+            gap: 25px;
+            margin: 20px 0;
+        }
+
+        .pixel-book-large {
+            width: 100px;
+            height: 150px;
+            flex-shrink: 0;
+            box-shadow: 6px 6px 0 var(--accent-color);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .card-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        #add-to-shelf-btn {
+            background: var(--wood-dark);
+            color: var(--paper-color);
+        }
+
+        .secondary {
+            background: transparent;
+            border: 1px solid var(--wood-dark) !important;
+        }
+
+        #loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 20;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .bob {
+            animation: bob 1s infinite ease-in-out;
+            display: inline-block;
+            font-size: 40px;
+        }
+
+        @keyframes bob {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">The Midnight Library</div>
+            <div class="api-controls">
+                <input type="password" id="api-key-input" placeholder="Gemini API Key...">
+                <button id="activate-btn">Enter Library</button>
+            </div>
+            <div id="turn-counter" class="turn-counter hidden">Turn 1 / 5</div>
+        </header>
+
+        <main>
+            <section id="chat-section">
+                <div id="chat-messages">
+                    <div class="message librarian">Good evening. The candles are flickering, and the shelves are humming
+                        with stories. I am the Librarian. Please provide your API key in the top right to unlock our
+                        session.</div>
+                </div>
+
+                <div id="chat-controls" class="chat-controls hidden">
+                    <textarea id="user-input" placeholder="Speak softly..." rows="1" disabled></textarea>
+                    <button id="send-btn" disabled>
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="loading-indicator" class="hidden">
+                    <div class="bob">🕯️</div>
+                    <p style="color: var(--accent-color); margin-top: 10px; font-family: 'Courier Prime';">Consulting
+                        the ancient texts...</p>
+                </div>
+            </section>
+
+            <aside id="bookshelf-section">
+                <h3>My Collection</h3>
+                <div id="bookshelf-grid">
+                    <div class="shelf-row"></div>
+                    <div class="shelf-row"></div>
+                    <div class="shelf-row"></div>
+                </div>
+            </aside>
+        </main>
+
+        <div id="recommendation-overlay" class="overlay hidden">
+            <div class="recommendation-card">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <span style="font-style: italic; color: var(--text-muted); font-family: 'Crimson Pro';">"This one
+                        was waiting for you..."</span>
+                    <button id="close-rec"
+                        style="background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
+                </div>
+                <div class="book-details">
+                    <div class="pixel-book-large" id="rec-book-icon"></div>
+                    <div class="text-content">
+                        <h2 id="rec-title" style="font-family: 'Crimson Pro'; font-size: 24px;">Book Title</h2>
+                        <h4 id="rec-author" style="font-weight: 400; color: var(--text-muted); margin-bottom: 10px;">by
+                            Author</h4>
+                        <p id="rec-description" style="font-size: 15px; line-height: 1.5; margin-bottom: 15px;">
+                            Description...</p>
+                        <div style="font-size: 14px;">
+                            <strong
+                                style="color: var(--text-muted); text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Why
+                                it fits:</strong>
+                            <ul id="rec-bullets" style="margin-top: 5px; margin-left: 20px;"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button id="add-to-shelf-btn">Add to Shelf</button>
+                    <button id="different-book-btn" class="secondary">Another?</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            apiKey: '',
+            turns: 0,
+            maxTurns: 5,
+            chatHistory: [],
+            bookshelf: JSON.parse(localStorage.getItem('lib_bookshelf') || '[]'),
+            isThinking: false,
+            recommendedBook: null
+        };
+
+        const elements = {
+            apiKeyInput: document.getElementById('api-key-input'),
+            activateBtn: document.getElementById('activate-btn'),
+            chatMessages: document.getElementById('chat-messages'),
+            userInput: document.getElementById('user-input'),
+            sendBtn: document.getElementById('send-btn'),
+            turnCounter: document.getElementById('turn-counter'),
+            loadingIndicator: document.getElementById('loading-indicator'),
+            recommendationOverlay: document.getElementById('recommendation-overlay'),
+            bookshelfGrid: document.getElementById('bookshelf-grid'),
+            chatControls: document.getElementById('chat-controls'),
+            recTitle: document.getElementById('rec-title'),
+            recAuthor: document.getElementById('rec-author'),
+            recDesc: document.getElementById('rec-description'),
+            recBullets: document.getElementById('rec-bullets'),
+            recBookIcon: document.getElementById('rec-book-icon'),
+            addToShelfBtn: document.getElementById('add-to-shelf-btn'),
+            differentBookBtn: document.getElementById('different-book-btn'),
+            closeRec: document.getElementById('close-rec')
+        };
+
+        const SYSTEM_PROMPT = `You are a warm, witty, and slightly romantic late-night librarian in a cozy library. 
+        Tone: Welcoming, poetic, helpful.
+        Rules:
+        1. Always speak first.
+        2. Round 2+: (A) Acknowledge user specifically (1-2 sentences), (B) Guide with ONE open prompt (1-2 sentences).
+        3. Use librarian flair.
+        4. Goal: infer mood, difficulty, purpose, and time budget.`;
+
+        // --- Init ---
+        elements.activateBtn.addEventListener('click', () => {
+            const key = elements.apiKeyInput.value.trim();
+            if (key) {
+                state.apiKey = key;
+                elements.apiKeyInput.classList.add('hidden');
+                elements.activateBtn.classList.add('hidden');
+                elements.chatControls.classList.remove('hidden');
+                elements.turnCounter.classList.remove('hidden');
+                startConversation();
+            }
+        });
+
+        elements.sendBtn.addEventListener('click', handleUserMessage);
+        elements.userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleUserMessage(); }
+        });
+        elements.closeRec.addEventListener('click', () => elements.recommendationOverlay.classList.add('hidden'));
+        elements.addToShelfBtn.addEventListener('click', addBookToShelf);
+        elements.differentBookBtn.addEventListener('click', () => triggerRecommendation(true));
+
+        renderBookshelf();
+
+        // --- Core ---
+        async function callGemini(messages, model = 'gemini-2.0-flash') {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${state.apiKey}`;
+            const body = {
+                contents: messages.map(m => ({
+                    role: m.role,
+                    parts: [{ text: m.parts[0].text }]
+                })),
+                systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
+            };
+
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (!resp.ok) {
+                const err = await resp.json().catch(() => ({}));
+                throw new Error(err.error?.message || resp.statusText);
+            }
+            const data = await resp.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        async function startConversation() {
+            const intro = "Good evening. The candles are flickering, and the shelves are humming with stories. Tell me, what kind of feeling are you looking to hold in your hands tonight? Are you seeking a quiet corner for your mind, or a spark for your spirit?";
+            elements.chatMessages.innerHTML = '';
+            addMessage("librarian", intro);
+            state.chatHistory = [{ role: "model", parts: [{ text: intro }] }];
+            elements.userInput.disabled = false;
+            elements.sendBtn.disabled = false;
+            updateTurnCounter();
+        }
+
+        async function handleUserMessage() {
+            const text = elements.userInput.value.trim();
+            if (!text || state.isThinking) return;
+
+            state.turns++;
+            addMessage("user", text);
+
+            const prompt = state.turns >= state.maxTurns ? text : `${text}\n\n(Librarian note: Round ${state.turns + 1}. Acknowledge then Guide.)`;
+            state.chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+            elements.userInput.value = '';
+            elements.userInput.disabled = true;
+            elements.sendBtn.disabled = true;
+            updateTurnCounter();
+
+            if (state.turns >= state.maxTurns) {
+                triggerRecommendation();
+            } else {
+                await getResponse();
+            }
+        }
+
+        async function getResponse() {
+            state.isThinking = true;
+            try {
+                let response;
+                try {
+                    response = await callGemini(state.chatHistory, 'gemini-2.0-flash');
+                } catch (e) {
+                    console.warn("Retrying with gemini-flash-latest...");
+                    response = await callGemini(state.chatHistory, 'gemini-flash-latest');
+                }
+                addMessage("librarian", response);
+                state.chatHistory.push({ role: "model", parts: [{ text: response }] });
+            } catch (err) {
+                addMessage("librarian", `Oh dear... it seems a ghost tripped. (${err.message}) Check your key or try again.`);
+            } finally {
+                state.isThinking = false;
+                elements.userInput.disabled = false;
+                elements.sendBtn.disabled = false;
+                elements.userInput.focus();
+            }
+        }
+
+        function addMessage(sender, text) {
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            div.textContent = text;
+            elements.chatMessages.appendChild(div);
+            elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+        }
+
+        function updateTurnCounter() {
+            elements.turnCounter.textContent = `Turn ${Math.min(state.turns + 1, 5)} / 5`;
+        }
+
+        async function triggerRecommendation(isDiff = false) {
+            elements.loadingIndicator.classList.remove('hidden');
+            elements.recommendationOverlay.classList.add('hidden');
+
+            try {
+                const prompt = `CRITICAL: Return ONLY a raw JSON object. No conversational text.
+                Based on our talk, recommend ONE real book as a JSON object: 
+                {"title": "...", "author": "...", "description": "Librarian-style description", "whyFits": ["Point 1", "Point 2"], "color": "teal/mustard/clay/forest/brown"}
+                ${isDiff ? 'Pick something completely different from any previous suggestions.' : ''}`;
+
+                let responseText;
+                try {
+                    responseText = await callGemini(
+                        [...state.chatHistory, { role: "user", parts: [{ text: prompt }] }],
+                        'gemini-2.0-flash'
+                    );
+                } catch (e) {
+                    responseText = await callGemini(
+                        [...state.chatHistory, { role: "user", parts: [{ text: prompt }] }],
+                        'gemini-flash-latest'
+                    );
+                }
+
+                // Robust JSON extraction
+                const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+                if (!jsonMatch) throw new Error("No JSON found");
+
+                const book = JSON.parse(jsonMatch[0]);
+
+                state.recommendedBook = book;
+                elements.recTitle.textContent = book.title;
+                elements.recAuthor.textContent = `by ${book.author}`;
+                elements.recDesc.textContent = book.description;
+                elements.recBullets.innerHTML = book.whyFits.map(f => `<li>${f}</li>`).join('');
+                elements.recBookIcon.style.backgroundColor = `var(--book-${book.color})`;
+                elements.recommendationOverlay.classList.remove('hidden');
+            } catch (err) {
+                console.error(err);
+                alert("The shelves are dusty tonight. Please try again.");
+            } finally {
+                elements.loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        function addBookToShelf() {
+            if (state.bookshelf.length >= 12) return alert("Shelf full!");
+            state.bookshelf.push(state.recommendedBook);
+            localStorage.setItem('lib_bookshelf', JSON.stringify(state.bookshelf));
+            elements.recommendationOverlay.classList.add('hidden');
+            renderBookshelf();
+        }
+
+        function renderBookshelf() {
+            const rows = elements.bookshelfGrid.querySelectorAll('.shelf-row');
+            rows.forEach(r => r.innerHTML = '');
+            state.bookshelf.forEach((book, i) => {
+                const row = rows[Math.floor(i / 4)];
+                if (row) {
+                    const b = document.createElement('div');
+                    b.className = 'pixel-book';
+                    b.style.backgroundColor = `var(--book-${book.color})`;
+                    b.style.height = `${45 + Math.random() * 15}px`;
+                    b.title = `${book.title} by ${book.author}`;
+                    row.appendChild(b);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
